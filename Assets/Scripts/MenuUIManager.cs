@@ -11,5 +11,10 @@ public class MenuUIManager : MonoBehaviour
         SceneManager.LoadScene(1);
     }
 
+    public void StartClicked()
+{
+    MainManager.Instance.SavePlayerName();
+}
+
    
 }

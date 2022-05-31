@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using System.IO;
+using TMPro; 
 
 public class MainManager : MonoBehaviour
 {
@@ -17,6 +19,24 @@ public class MainManager : MonoBehaviour
     private int m_Points;
     
     private bool m_GameOver = false;
+
+    public TMP_InputField PlayerNameInput; // Somewhere to store player name input
+    public string PlayerName; // Store player name text
+    public static MainManager Instance;
+
+      private void Awake() 
+    {
+        // Making this a singleton and not destroyed on load
+    if (Instance != null)
+    {
+        Destroy(gameObject);
+        return;
+    }
+
+    Instance = this;
+    DontDestroyOnLoad(gameObject);
+    
+    }
 
     
     // Start is called before the first frame update
@@ -36,6 +56,11 @@ public class MainManager : MonoBehaviour
                 brick.onDestroyed.AddListener(AddPoint);
             }
         }
+
+             if(PlayerName != null)
+             {
+             PlayerNameInput.text = PlayerName;
+             }
     }
 
     private void Update()
@@ -73,4 +98,37 @@ public class MainManager : MonoBehaviour
         m_GameOver = true;
         GameOverText.SetActive(true);
     }
+
+    [System.Serializable]
+    class SaveData
+    {
+        public string PlayerName;
+    }
+
+    public void SavePlayerName()
+    {
+    SaveData data = new SaveData();
+    data.PlayerName = PlayerName;
+
+    string json = JsonUtility.ToJson(data);
+  
+    File.WriteAllText(Application.persistentDataPath + "/savefile.json", json);
+    }
+
+    public void LoadPlayerName()
+    {
+    string path = Application.persistentDataPath + "/savefile.json";
+    if (File.Exists(path))
+    {
+        string json = File.ReadAllText(path);
+        SaveData data = JsonUtility.FromJson<SaveData>(json);
+
+        PlayerName = data.PlayerName;
+    }
+    }
+
+         public void SaveName(string newName) 
+         {
+         //PlayerName = PlayerNameInput;
+         }
 }
